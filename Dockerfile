@@ -4,14 +4,8 @@ FROM eclipse-temurin:17-jdk-jammy as builder
 # Set the working directory
 WORKDIR /app
 
-# Install build dependencies
-RUN apt-get update && \
-    apt-get install -y git npm && \
-    npm install -g yarn
-
 # Build the project (as per https://www.traccar.org/build/)
-RUN ls
-RUN ./gradlew build
+RUN /.app_platform_workspace/gradlew build
 
 # Create final runtime image
 FROM eclipse-temurin:17-jre-jammy
