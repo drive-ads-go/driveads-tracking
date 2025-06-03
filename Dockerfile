@@ -13,10 +13,10 @@ FROM eclipse-temurin:17-jre-jammy
 WORKDIR /opt/traccar
 
 # Copy built artifacts from builder stage
-COPY --from=builder /app/build/libs/*.war ./traccar-web.war
-COPY --from=builder /app/traccar.xml ./
-COPY --from=builder /app/schema ./schema
-COPY --from=builder /app/templates ./templates
+COPY --from=builder /.app_platform_workspace/build/libs/*.war ./traccar-web.war
+COPY --from=builder /.app_platform_workspace/traccar.xml ./
+COPY --from=builder /.app_platform_workspace/schema ./schema
+COPY --from=builder /.app_platform_workspace/templates ./templates
 
 # Create data directory
 RUN mkdir -p /opt/traccar/data
