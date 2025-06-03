@@ -1,9 +1,6 @@
 # Use official OpenJDK runtime as a parent image
 FROM eclipse-temurin:17-jdk-jammy as builder
 
-# Set the working directory
-WORKDIR /app
-
 # Build the project (as per https://www.traccar.org/build/)
 RUN /.app_platform_workspace/gradlew build
 
