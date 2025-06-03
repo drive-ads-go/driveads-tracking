@@ -10,6 +10,7 @@ RUN apt-get update && \
     npm install -g yarn
 
 # Build the project (as per https://www.traccar.org/build/)
+RUN chmod +x gradlew
 RUN ./gradlew build
 
 # Create final runtime image
