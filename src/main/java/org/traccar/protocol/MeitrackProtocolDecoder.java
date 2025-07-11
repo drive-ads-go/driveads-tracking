@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 - 2023 Anton Tananaev (anton@traccar.org)
+ * Copyright 2012 - 2025 Anton Tananaev (anton@traccar.org)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -453,9 +453,15 @@ public class MeitrackProtocolDecoder extends BaseProtocolDecoder {
                     }
                     case 0x4B -> buf.skipBytes(length); // network information
                     case 0xFE31 -> {
-                        buf.readUnsignedByte(); // alarm protocol
-                        buf.readUnsignedByte(); // alarm type
-                        buf.skipBytes(length - 2);
+                        int alarmProtocol = buf.readUnsignedByte();
+                        position.set("alarmType", buf.readUnsignedByte());
+                        if (alarmProtocol == 0x02 && length > 3) {
+                            String file = buf.readCharSequence(length - 2, StandardCharsets.US_ASCII).toString();
+                            String folder = file.substring(0, 8).replaceAll("(\\d{4})(\\d{2})(\\d{2})", "$1-$2-$3");
+                            position.set(Position.KEY_IMAGE, folder + "/" + file);
+                        } else {
+                            buf.skipBytes(length - 2);
+                        }
                     }
                     case 0xFE73 -> {
                         buf.readUnsignedByte(); // version

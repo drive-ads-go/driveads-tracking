@@ -428,6 +428,9 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
             position.set(Position.KEY_MOTION, BitUtil.check(status, 4));
         }
         position.set(Position.KEY_BLOCKED, BitUtil.check(status, 10));
+        if ("MV810G".equals(model) || "MV710G".equals(model)) {
+            position.set(Position.KEY_DOOR, BitUtil.check(status, 16));
+        }
         position.set(Position.KEY_CHARGE, BitUtil.check(status, 26));
 
         position.setValid(BitUtil.check(status, 1));
@@ -507,6 +510,9 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                 case 0x06:
                     position.set(Position.KEY_BATTERY_LEVEL, buf.readUnsignedByte());
                     break;
+                case 0x14:
+                    position.set("videoAlarm", buf.readUnsignedInt());
+                    break;
                 case 0x25:
                     position.set(Position.KEY_INPUT, buf.readUnsignedInt());
                     break;
@@ -556,7 +562,10 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     position.addAlarm(BitUtil.check(alarm, 9) ? Position.ALARM_BRAKING : null);
                     position.addAlarm(BitUtil.check(alarm, 10) ? Position.ALARM_CORNERING : null);
                     buf.readUnsignedShort(); // external switch state
-                    buf.skipBytes(4); // reserved
+                    long alarm2 = buf.readUnsignedInt();
+                    if ("MV810G".equals(model) || "MV710G".equals(model)) {
+                        position.addAlarm(BitUtil.check(alarm2, 16) ? Position.ALARM_DOOR : null);
+                    }
                     break;
                 case 0x60:
                     event = buf.readUnsignedShort();
@@ -619,6 +628,9 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     buf.readUnsignedByte(); // content
                     endIndex = buf.writerIndex() - 2;
                     decodeExtension(position, buf, endIndex);
+                    break;
+                case 0x82:
+                    position.set(Position.KEY_POWER, buf.readUnsignedShort() / 10.0);
                     break;
                 case 0x91:
                     position.set(Position.KEY_BATTERY, buf.readUnsignedShort() * 0.1);
